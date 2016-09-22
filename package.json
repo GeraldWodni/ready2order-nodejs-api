@@ -1,0 +1,28 @@
+{
+  "name": "ready2order-api",
+  "version": "1.0.0",
+  "description": "Wrapper for simply using ready2order API api.ready2order.at",
+  "main": "api.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -R spec"
+  },
+  "keywords": [
+    "ready2order",
+    "api"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/GeraldWodni/ready2order-api.git"
+  },
+  "license": "MIT",
+
+  "author": "Gerald Wodni <gerald.wodni@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2"
+  }
+}
