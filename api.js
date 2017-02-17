@@ -18,7 +18,10 @@ module.exports = function( opts ) {
 
     /* supply default options */
     _.defaults( opts, {
-        api_endpoint: 'https://api.ready2order.at/v1'
+        api_endpoint: 'https://api.ready2order.at/v1',
+        retries: 0,
+        retryTimeout: 3000,
+        retryErrorLog: function( err ) {}
     });
 
     /* ensure trailing slash on api_endpoint */
@@ -28,7 +31,7 @@ module.exports = function( opts ) {
     opts.api_endpoint_url_object = _.pick( url.parse( opts.api_endpoint ), ['protocol', 'host', 'hostname', 'path', 'port']);
 
     /* common requester */
-    function makeRequest( httpMethod, args ) {
+    function makeBasicRequest( httpMethod, args, cb ) {
         if( args.length == 0 )
             throw new Error( 'ready2order: No method given' );
         
@@ -40,7 +43,9 @@ module.exports = function( opts ) {
         var reqOpts     = _.isObject( args[2] ) & !_.isFunction( args[2] ) ? args[2] : {};
         /* find callback (can be supplied as any arguemnt from 1-3 */
         var callback    = function( err, res ) {
-            var cb = _.isFunction( args[1] ) ? args[1] : _.isFunction( args[2] ) ? args[2] : args[3];
+            /* report error */
+            if( err )
+                return cb( err );
 
             /* check status */
             if( res.statusCode != 200 )
@@ -101,6 +106,27 @@ module.exports = function( opts ) {
         req.end();
     }
 
+    function makeRequest( method, args ) {
+        var remainingRetries= opts.retries;
+        var callback = _.isFunction( args[1] ) ? args[1] : _.isFunction( args[2] ) ? args[2] : args[3];
+
+        /* replace callback */
+        function retryWrapper( err, data ) {
+            /* retry: report error and hold back for retryTimeout */
+            if( remainingRetries-- > 0 && err ) {
+                opts.retryErrorLog( err );
+                setTimeout( function() {
+                    makeBasicRequest( method, args, retryWrapper );
+                }, opts.retryTimeout );
+            }
+            else
+                callback( err, data );
+        }
+
+        /* first request */
+        makeBasicRequest( method, args, retryWrapper );
+    }
+
     
     /* expose api */
     return {
@@ -118,6 +144,9 @@ module.exports = function( opts ) {
         },
         put:    function( method, args, reqOpts, callback ) {
             makeRequest( 'PUT',     arguments );
+        },
+        updateOpts: function( newOpts ) {
+            opts = _.extend( opts, newOpts );
         }
     };
 }

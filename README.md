@@ -27,7 +27,7 @@ Get client data
 ```javascript
 var ready2order = require('ready2order-api');
 
-var r2o = ready2order('user-token');
+var r2o = ready2order({api_key:'user-token'});
 r2o.get('company', function( err, json ) {
     if( err ) return console.error( err );
 
@@ -40,7 +40,7 @@ Insert new productgroup with one product
 ```javascript
 var ready2order = require('ready2order-api');
 
-var r2o = ready2order('user-token');
+var r2o = ready2order({api_key:'user-token'});
 
 /* new productgroup */
 r2o.put( 'productgroups', {
@@ -64,6 +64,32 @@ r2o.put( 'productgroups', {
     });
 });
 ```
+
+Methods
+-------
+Common (also used by PHP-API).
+Please see the [official documentation](http://docs.ready2order.apiary.io/)
+- `delete`
+- `get`
+- `patch`
+- `post`
+- `put`
+Extensions (available in this implementation)
+- `updateOpts( opts )`: changes to configuration options in the running instance
+```javascript
+r2o.updateOpts({retries:3});
+...
+r2o.updateOpts({retries:0});
+```
+
+Configuration Options
+---------------------
+Common (also used by PHP-API)
+- `api_key`: *required*, your user-token
+- `api_endpoint`: api-url-prefix, defaults to `https://api.ready2order.at/v1`
+Extensions (available in this implementation)
+- `retries`: retries on failures (i.e. SocketHangUp), defaults to `0`
+- `retryErrorLog`: callback on retry-failure, defaults to `function(err) {}`
 
 This library is based on [duxthefux/ready2order-php-api-v1](https://github.com/duxthefux/ready2order-php-api-v1)
 --------
