@@ -48,7 +48,7 @@ module.exports = function( opts ) {
                 return cb( err );
 
             /* check status */
-            if( res.statusCode != 200 )
+            if( res.statusCode < 200 || res.statusCode > 299 )
                 return cb( new Error( res.statusCode + ' ' + res.statusMessage ) );
 
             var data = '';
