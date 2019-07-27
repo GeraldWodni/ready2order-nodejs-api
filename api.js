@@ -50,7 +50,7 @@ module.exports = function( opts ) {
 
             /* check status */
             if( res.statusCode < 200 || res.statusCode > 299 )
-                return cb( new Error( res.statusCode + ' ' + res.statusMessage ) );
+                err = new Error( res.statusCode + ' ' + res.statusMessage );
 
             var data = '';
             res.on( 'data', function( chunk ) {
