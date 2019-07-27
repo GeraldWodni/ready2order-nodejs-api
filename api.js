@@ -10,6 +10,7 @@
 var _       = require( 'underscore' );
 var https   = require( 'https' );
 var url     = require( 'url' );
+var fs      = require("fs");
 
 /* TODO: create test from 2nd example, upload as NPM package */
 module.exports = function( opts ) {
@@ -82,13 +83,32 @@ module.exports = function( opts ) {
             }
         }, reqOpts );
 
+        /* log */
+        function log( err ) {
+            if( opts.logFile )
+                fs.appendFile( opts.logFile, JSON.stringify( {
+                    time: new Date(),
+                    method: method,
+                    args: methodArgs,
+                    httpMethod: httpMethod,
+                    success: err == null,
+                    err: err || null
+                }, null, 4 ),
+                function _logFileCallback( err ) {
+                    if( err )
+                        console.log( "r2o-logFile-Error:", err )
+                });
+        }
+
         /* perform request and hook callback */
         var req = https.request( httpOpts, function( res ) {
+            log( null );
             callback( null, res );
         });
 
         /* handle errors */
         req.on( 'error', function( err ) {
+            log( err );
             callback( err );
         });
 
