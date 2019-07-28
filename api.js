@@ -22,7 +22,7 @@ module.exports = function( opts ) {
         api_endpoint: 'https://api.ready2order.at/v1',
         retries: 0,
         retryTimeout: 3000,
-        retryErrorLog: function( err ) {}
+        retryErrorLog: function( err, data ) {}
     });
 
     /* ensure trailing slash on api_endpoint */
@@ -134,7 +134,7 @@ module.exports = function( opts ) {
         function retryWrapper( err, data ) {
             /* retry: report error and hold back for retryTimeout */
             if( remainingRetries-- > 0 && err ) {
-                opts.retryErrorLog( err );
+                opts.retryErrorLog( err, data );
                 setTimeout( function() {
                     makeBasicRequest( method, args, retryWrapper );
                 }, opts.retryTimeout );
